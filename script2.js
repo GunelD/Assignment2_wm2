@@ -1,24 +1,29 @@
-document.addEventListener('DOMContentLoaded', showPageContent(), false);
+document.addEventListener('DOMContentLoaded', showPageContent, false);
 
 function showPageContent() {
-    const url = 'https://dummyjson.com/docs/products';
+    const url = 'https://dummyjson.com/products';
 
     const container = document.querySelector('main');
 
     function showProducts(products) {
+
+        console.log(products)
+       
         products.forEach(product => {
             const card = document.createElement('div');
             card.setAttribute('class', 'card');
 
-
             const title = document.createElement('h2');
             title.textContent = product.title;
+
+            const thumbnail = document.createElement('img');
+            thumbnail.setAttribute('src', product.thumbnail);
 
             const price = document.createElement('p');
             price.textContent = product.price;
 
-            const discount = document.createElement('p');
-            discount.textContent = product.discount;
+            const discountPercentage = document.createElement('p');
+            discountPercentage.textContent = product.discountPercentage + '%';
 
             const category = document.createElement('p');
             category.textContent = product.category;
@@ -26,23 +31,20 @@ function showPageContent() {
             const stock = document.createElement('p');
             stock.textContent = product.stock;
 
-            const thumbnail = document.createElement('p');
-            thumbnail.textContent = product.thumbnail;
 
             container.appendChild(card);
 
             card.appendChild(title);
+            card.appendChild(thumbnail);
             card.appendChild(price);
-            card.appendChild(discount);
+            card.appendChild(discountPercentage);
             card.appendChild(category);
             card.appendChild(stock);
-            card.appendChild(thumbnail);
         });
     }
 
     fetch(url)
         .then(response => response.json())
-        .then(data => showProducts(data))
+        .then(data => showProducts(data.products))
         .catch(handleFetchError);
 };
-
