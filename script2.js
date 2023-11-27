@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', showPageContent, false);
 
 function showPageContent() {
-    const url = 'https://dummyjson.com/products';
+    const url = 'https://dummyjson.com/products?limit=100&select=title,category,discountPercentage,price,stock,thumbnail';
 
     const container = document.querySelector('main');
 
@@ -39,7 +39,13 @@ function showPageContent() {
             card.appendChild(discountPercentage);
             card.appendChild(category);
             card.appendChild(stock);
+            card.addEventListener('click', () => showProductDetails(product));
         });
+    }
+
+    function showProductDetails(product) {
+        // Open the product details in a new tab
+        window.open('product_Details.html?id=' + product.id, '_blank');
     }
 
     function handleFetchError() {

@@ -8,12 +8,11 @@ div.card
     display: inline-block;
     width: 230px;
     height: 430px;
-    margin: 5px;
+    margin: 8px;
     text-align: center;
     background-color: white;
     border-radius: 5%;
     vertical-align: top;
-
 }
 
 img
@@ -21,4 +20,9 @@ img
     width: 230px;
     height: 170px;
     border-radius: 5%;
+}
+
+div.card:hover
+{
+ transform: scale(1.1);   
 }
