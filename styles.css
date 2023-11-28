@@ -8,7 +8,7 @@ div.card
 {
     display: inline-block;
     width: 230px;
-    height: 450px;
+    height: 470px;
     margin: 8px;
     text-align: center;
     background-color: white;
@@ -21,7 +21,7 @@ div.card
 img
 {
     width: 230px;
-    height: 170px;
+    height: 190px;
     border-radius: 5%;
 }
 
