@@ -1,89 +1,124 @@
 document.addEventListener('DOMContentLoaded', showPageContent, false);
 
-function showPageContent() {
-    const url = 'https://dummyjson.com/products?limit=100&select=title,category,discountPercentage,price,stock,thumbnail';
+const url = 'https://dummyjson.com/products?limit=100&select=title,category,discountPercentage,price,stock,thumbnail';
 
-    const container = document.querySelector('main');
-    const searchInput = document.getElementById('searchInput');
+let categories = [];
+
+function fetchCategories() {
+    return fetch(url)
+        .then(function(response) {
+            return response.json();
+        })
+        .then(function(data) {
+            categories = [];
+            data.products.forEach(function(product) {
+                if (!categories.includes(product.category)) {
+                    categories.push(product.category);
+                }
+            });
+            populateCategoryDropdown();
+        })
+        .catch(function(error) {
+            console.error('Error fetching categories:', error);
+        });
+}
+
+
+function populateCategoryDropdown() {
     const categorySelect = document.getElementById('categorySelect');
 
-    function showProducts(products) {
-        container.innerHTML = '';
+    categorySelect.innerHTML = '';
 
-        products.forEach(product => {
-            const card = document.createElement('div');
-            card.setAttribute('class', 'card');
+    const allOption = document.createElement('option');
+    allOption.value = '';
+    allOption.textContent = 'All';
+    categorySelect.appendChild(allOption);
 
-            const thumbnail = document.createElement('img');
-            thumbnail.setAttribute('src', product.thumbnail);
+    categories.forEach(function(category) {
+        const option = document.createElement('option');
+        option.value = category;
+        option.textContent = category;
+        categorySelect.appendChild(option);
+    });
+}
 
-            const title = document.createElement('h2');
-            title.textContent = product.title.charAt(0).toUpperCase() + product.title.slice(1);
-            const price = document.createElement('p');
-            price.textContent = 'Price: ' + product.price + '$';
+function showPageContent() {
+    fetchCategories().then(function() {
+        const container = document.querySelector('main');
+        const searchInput = document.getElementById('searchInput');
+        const categorySelect = document.getElementById('categorySelect');
 
-            const discountPercentage = document.createElement('p');
-            discountPercentage.textContent = 'Discount Percentage: ' + product.discountPercentage + '%';
+        function showProducts(products) {
+            container.innerHTML = '';
 
-            const category = document.createElement('p');
-            category.textContent = 'Category: ' + product.category;
+            products.forEach(product => {
+                const card = document.createElement('div');
+                card.setAttribute('class', 'card');
 
-            const stock = document.createElement('p');
-            stock.textContent = 'Current Stock: ' + product.stock;
+                const thumbnail = document.createElement('img');
+                thumbnail.setAttribute('src', product.thumbnail);
 
-            container.appendChild(card);
+                const title = document.createElement('h2');
+                title.textContent = product.title.charAt(0).toUpperCase() + product.title.slice(1);
+                const price = document.createElement('p');
+                price.textContent = 'Price: ' + product.price + '$';
 
-            card.appendChild(thumbnail);
-            card.appendChild(title);
-            card.appendChild(price);
-            card.appendChild(discountPercentage);
-            card.appendChild(category);
-            card.appendChild(stock);
-            card.addEventListener('click', () => showProductDetails(product));
-        });
-    }
+                const discountPercentage = document.createElement('p');
+                discountPercentage.textContent = 'Discount Percentage: ' + product.discountPercentage + '%';
 
-    function showProductDetails(product) {
-        // Open the product details in a new tab
-        window.open('product_Details.html?id=' + product.id, '_blank');
-    }
+                const category = document.createElement('p');
+                category.textContent = 'Category: ' + product.category;
 
-    function handleFetchError(error) {
-        console.error('Error fetching data:', error);
-        const errorMessage = document.createElement('p');
-        errorMessage.textContent = 'Error fetching data, please try again';
-        container.appendChild(errorMessage);
-    }
+                const stock = document.createElement('p');
+                stock.textContent = 'Current Stock: ' + product.stock;
 
-    function filterProducts(searchKeyword, selectedCategory, products) {
-        return products.filter(product => {
-            const matchesSearchTitle = product.title.toLowerCase().includes(searchKeyword.toLowerCase());
-            const matchesSearchCategory = product.category.toLowerCase().includes(searchKeyword.toLowerCase());
-            const matchesCategory = selectedCategory === '' || product.category.toLowerCase() === selectedCategory.toLowerCase();
-            return (matchesSearchTitle || matchesSearchCategory) && matchesCategory && product.stock > 0;
-        });
-    }
-    
-    function handleSearch() {
-        const searchKeyword = searchInput.value;
-        const selectedCategory = categorySelect.value;
+                container.appendChild(card);
 
-        // Fetch data and show products
-        fetch(url)
-            .then(response => response.json())
-            .then(data => {
-                const filteredProducts = filterProducts(searchKeyword, selectedCategory, data.products);
-                showProducts(filteredProducts);
-            })
-            .catch(handleFetchError);
-    }
+                card.appendChild(thumbnail);
+                card.appendChild(title);
+                card.appendChild(price);
+                card.appendChild(discountPercentage);
+                card.appendChild(category);
+                card.appendChild(stock);
+                card.addEventListener('click', () => showProductDetails(product));
+            });
+        }
 
-    // Event listeners for search input and category select
-    searchInput.addEventListener('input', handleSearch);
-    categorySelect.addEventListener('change', handleSearch);
+        function showProductDetails(product) {
+            window.open('product_Details.html?id=' + product.id, '_blank');
+        }
 
-    // Initial fetch and show
-    handleSearch();
+        function handleFetchError(error) {
+            console.error('Error fetching data:', error);
+            const errorMessage = document.createElement('p');
+            errorMessage.textContent = 'Error fetching data, please try again';
+            container.appendChild(errorMessage);
+        }
+
+        function filterProducts(searchKeyword, selectedCategory, products) {
+            return products.filter(product => {
+                const matchesSearchTitle = product.title.toLowerCase().includes(searchKeyword.toLowerCase());
+                const matchesSearchCategory = product.category.toLowerCase().includes(searchKeyword.toLowerCase());
+                const matchesCategory = selectedCategory === '' || product.category.toLowerCase() === selectedCategory.toLowerCase();
+                return (matchesSearchTitle || matchesSearchCategory) && matchesCategory && product.stock > 0;
+            });
+        }
+
+        function handleSearch() {
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    const filteredProducts = filterProducts(searchInput.value, categorySelect.value, data.products);
+                    showProducts(filteredProducts);
+                })
+                .catch(handleFetchError);
+        }
+
+        searchInput.addEventListener('input', handleSearch);
+        categorySelect.addEventListener('change', handleSearch);
+
+        handleSearch();
+    });
 }
 
 
