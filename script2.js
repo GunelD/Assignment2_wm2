@@ -1,8 +1,9 @@
 document.addEventListener('DOMContentLoaded', showPageContent, false);
 
 const url = 'https://dummyjson.com/products?limit=100&select=title,category,discountPercentage,price,stock,thumbnail';
-
-let categories = [];
+const itemsPerPage = 10;
+let currentPage = 1;
+let allProducts = [];
 
 function fetchCategories() {
     return fetch(url)
@@ -10,6 +11,7 @@ function fetchCategories() {
             return response.json();
         })
         .then(function(data) {
+            allProducts = data.products;
             categories = [];
             data.products.forEach(function(product) {
                 if (!categories.includes(product.category)) {
@@ -22,7 +24,6 @@ function fetchCategories() {
             console.error('Error fetching categories:', error);
         });
 }
-
 
 function populateCategoryDropdown() {
     const categorySelect = document.getElementById('categorySelect');
@@ -47,11 +48,16 @@ function showPageContent() {
         const container = document.querySelector('main');
         const searchInput = document.getElementById('searchInput');
         const categorySelect = document.getElementById('categorySelect');
+        const paginationContainer = document.querySelector('footer');
 
         function showProducts(products) {
             container.innerHTML = '';
 
-            products.forEach(product => {
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const displayedProducts = products.slice(startIndex, endIndex);
+
+            displayedProducts.forEach(product => {
                 const card = document.createElement('div');
                 card.setAttribute('class', 'card');
 
@@ -82,6 +88,8 @@ function showPageContent() {
                 card.appendChild(stock);
                 card.addEventListener('click', () => showProductDetails(product));
             });
+
+            displayPaginationControls(products);
         }
 
         function showProductDetails(product) {
@@ -105,13 +113,26 @@ function showPageContent() {
         }
 
         function handleSearch() {
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    const filteredProducts = filterProducts(searchInput.value, categorySelect.value, data.products);
-                    showProducts(filteredProducts);
-                })
-                .catch(handleFetchError);
+            const filteredProducts = filterProducts(searchInput.value, categorySelect.value, allProducts);
+            showProducts(filteredProducts);
+        }
+
+        function displayPaginationControls(products) {
+            paginationContainer.innerHTML = '';
+
+            const totalPages = Math.ceil(products.length / itemsPerPage);
+
+            for (let i = 1; i <= totalPages; i++) {
+                const pageButton = document.createElement('button');
+                pageButton.textContent = i;
+                pageButton.addEventListener('click', () => handlePageChange(i));
+                paginationContainer.appendChild(pageButton);
+            }
+        }
+
+        function handlePageChange(pageNumber) {
+            currentPage = pageNumber;
+            handleSearch();
         }
 
         searchInput.addEventListener('input', handleSearch);
@@ -120,5 +141,6 @@ function showPageContent() {
         handleSearch();
     });
 }
+
 
 
