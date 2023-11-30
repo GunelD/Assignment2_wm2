@@ -13,11 +13,17 @@ function showDetailsPageContent() {
         const details = document.createElement('div');
         details.setAttribute('class', 'details');
 
-        const thumbnail = document.createElement('img');
-        thumbnail.setAttribute('src', product.thumbnail);
 
         const title = document.createElement('h2');
         title.textContent = product.title.charAt(0).toUpperCase() + product.title.slice(1);
+
+        const imagesGalery = document.createElement('div');
+        imagesGalery.setAttribute('class', 'images-galery');
+        for (const imageUrl of product.images) {
+            const image = document.createElement('img');
+            image.src = imageUrl;
+            imagesGalery.appendChild(image);
+        }
 
         const price = document.createElement('p');
         price.textContent = 'Price: ' + product.price + '$';
@@ -39,19 +45,20 @@ function showDetailsPageContent() {
 
         const description = document.createElement('p');
         description.textContent = 'Product Description: ' + product.description;
-        
+
+
         container.appendChild(details);
-    
-        details.appendChild(thumbnail);
+
         details.appendChild(title);
+        details.appendChild(imagesGalery);
         details.appendChild(price);
         details.appendChild(discountPercentage);
         details.appendChild(category);
-        details.appendChild(stock);
-        details.appendChild(rating);
         details.appendChild(brand);
+        details.appendChild(rating);
+        details.appendChild(stock);
         details.appendChild(description);
-}
+    }
 
     function handleFetchError() {
         const error = document.createElement('p');
@@ -61,6 +68,6 @@ function showDetailsPageContent() {
 
     fetch(url)
         .then(response => response.json())
-        .then(data => showProductDetails(data)) // Assuming the API returns a single product
+        .then(data => showProductDetails(data)) 
         .catch(handleFetchError);
 }

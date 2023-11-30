@@ -5,7 +5,7 @@ const itemsPerPage = 10;
 let currentPage = 1;
 let allProducts = [];
 
-function fetchCategories() {
+function getCategories() {
     return fetch(url)
         .then(function(response) {
             return response.json();
@@ -18,14 +18,15 @@ function fetchCategories() {
                     categories.push(product.category);
                 }
             });
-            populateCategoryDropdown();
+            dataCategorydropdown();
         })
-        .catch(function(error) {
+        .catch(error=>
+         {
             console.error('Error fetching categories:', error);
         });
 }
 
-function populateCategoryDropdown() {
+function dataCategorydropdown() {
     const categorySelect = document.getElementById('categorySelect');
 
     categorySelect.innerHTML = '';
@@ -44,7 +45,7 @@ function populateCategoryDropdown() {
 }
 
 function showPageContent() {
-    fetchCategories().then(function() {
+    getCategories().then(function() {
         const container = document.querySelector('main');
         const searchInput = document.getElementById('searchInput');
         const categorySelect = document.getElementById('categorySelect');
@@ -96,12 +97,12 @@ function showPageContent() {
             window.open('product_Details.html?id=' + product.id, '_blank');
         }
 
-        function handleFetchError(error) {
-            console.error('Error fetching data:', error);
-            const errorMessage = document.createElement('p');
-            errorMessage.textContent = 'Error fetching data, please try again';
-            container.appendChild(errorMessage);
-        }
+        // function handleFetchError(error) {
+        //     console.error('Error fetching data:', error);
+        //     const errorMessage = document.createElement('p');
+        //     errorMessage.textContent = 'Error fetching data, please try again';
+        //     container.appendChild(errorMessage);
+        // }
 
         function filterProducts(searchKeyword, selectedCategory, products) {
             return products.filter(product => {
@@ -141,6 +142,5 @@ function showPageContent() {
         handleSearch();
     });
 }
-
 
 

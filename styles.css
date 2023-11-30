@@ -18,7 +18,7 @@ div.card
 
 }
 
-img
+.card img
 {
     width: 230px;
     height: 190px;
@@ -47,4 +47,22 @@ label
 {
   font-size: 20px;
   font-weight: bold;  
+}
+
+footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px; 
+}
+
+button {
+    margin: 0 5px; 
+}
+
+.images-galery {
+    width: 100px; 
+    height: 100px; 
+    margin: 5px; 
+    border-radius: 50%;
 }
