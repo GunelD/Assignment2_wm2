@@ -14,11 +14,6 @@ function handleFetchError() {
 
 
 function getCategories() {
-    if (!navigator.onLine) {
-        console.error('No network connection.');
-        return Promise.reject('No network connection.');
-    }
-
     return fetch(url)
         .then(function(response) {
             if (!response.ok) {
@@ -40,7 +35,6 @@ function getCategories() {
             console.error('Error fetching categories:', error);
         });
 }
-
 
 
 function dataCategorydropdown() {
@@ -120,9 +114,9 @@ function showPageContent() {
 
         function filterProducts(searchKeyword, selectedCategory, products) {
             return products.filter(product => {
-                const matchesSearchTitle = product.title.trim().toLowerCase().includes(searchKeyword.toLowerCase());
-                const matchesSearchCategory = product.category.trim().toLowerCase().includes(searchKeyword.toLowerCase());
-                const matchesDescription = product.description.trim().toLowerCase().includes(searchKeyword.toLowerCase());
+                const matchesSearchTitle = product.title.trim().toLowerCase().includes(searchKeyword.trim().toLowerCase());
+                const matchesSearchCategory = product.category.trim().toLowerCase().includes(searchKeyword.trim().toLowerCase());
+                const matchesDescription = product.description.trim().toLowerCase().includes(searchKeyword.trim().toLowerCase());
                 const matchesCategory = selectedCategory === '' || product.category.toLowerCase() === selectedCategory.toLowerCase();
                 return (matchesSearchTitle || matchesSearchCategory || matchesDescription) && matchesCategory;
             });
