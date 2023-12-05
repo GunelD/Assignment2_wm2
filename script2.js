@@ -1,13 +1,29 @@
 document.addEventListener('DOMContentLoaded', showPageContent, false);
 
-const url = 'https://dummyjson.com/products?limit=100&select=title,category,discountPercentage,price,stock,thumbnail';
+const url = 'https://dummyjson.com/products?limit=100&select=title,category,discountPercentage,price,stock,thumbnail,description';
 const itemsPerPage = 10;
 let currentPage = 1;
 let allProducts = [];
+let categories = [];
+
+function handleFetchError() {
+    const error = document.createElement('p');
+    error.textContent = 'Error fetching data, please try again';
+    container.appendChild(error);
+}
+
 
 function getCategories() {
+    if (!navigator.onLine) {
+        console.error('No network connection.');
+        return Promise.reject('No network connection.');
+    }
+
     return fetch(url)
         .then(function(response) {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
             return response.json();
         })
         .then(function(data) {
@@ -20,11 +36,12 @@ function getCategories() {
             });
             dataCategorydropdown();
         })
-        .catch(error=>
-         {
+        .catch(function(error) {
             console.error('Error fetching categories:', error);
         });
 }
+
+
 
 function dataCategorydropdown() {
     const categorySelect = document.getElementById('categorySelect');
@@ -79,6 +96,9 @@ function showPageContent() {
                 const stock = document.createElement('p');
                 stock.textContent = 'Current Stock: ' + product.stock;
 
+                const description = document.createElement('p');
+                description.textContent = product.description;
+
                 container.appendChild(card);
 
                 card.appendChild(thumbnail);
@@ -96,22 +116,19 @@ function showPageContent() {
         function showProductDetails(product) {
             window.open('product_Details.html?id=' + product.id, '_blank');
         }
-
-        // function handleFetchError(error) {
-        //     console.error('Error fetching data:', error);
-        //     const errorMessage = document.createElement('p');
-        //     errorMessage.textContent = 'Error fetching data, please try again';
-        //     container.appendChild(errorMessage);
-        // }
+    
 
         function filterProducts(searchKeyword, selectedCategory, products) {
             return products.filter(product => {
-                const matchesSearchTitle = product.title.toLowerCase().includes(searchKeyword.toLowerCase());
-                const matchesSearchCategory = product.category.toLowerCase().includes(searchKeyword.toLowerCase());
+                const matchesSearchTitle = product.title.trim().toLowerCase().includes(searchKeyword.toLowerCase());
+                const matchesSearchCategory = product.category.trim().toLowerCase().includes(searchKeyword.toLowerCase());
+                const matchesDescription = product.description.trim().toLowerCase().includes(searchKeyword.toLowerCase());
                 const matchesCategory = selectedCategory === '' || product.category.toLowerCase() === selectedCategory.toLowerCase();
-                return (matchesSearchTitle || matchesSearchCategory) && matchesCategory && product.stock > 0;
+                return (matchesSearchTitle || matchesSearchCategory || matchesDescription) && matchesCategory;
             });
         }
+        
+        
 
         function handleSearch() {
             const filteredProducts = filterProducts(searchInput.value, categorySelect.value, allProducts);
